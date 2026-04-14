@@ -87,11 +87,11 @@ export function Universe() {
           <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto font-medium mb-10">
             Trải nghiệm hệ sinh thái Gamification độc đáo, nơi bạn không chỉ chơi mà còn nhận được những giá trị thực thông qua cơ chế O2O và kinh tế phi tập trung.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3 max-w-[400px] mx-auto md:flex md:flex-wrap md:justify-center md:gap-4 md:max-w-none mb-12">
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" variant="outline" className="rounded-full border-primary/50 hover:bg-primary/10 text-primary px-8 h-12 text-base font-bold transition-all hover:scale-105">
-                  <Info className="mr-2 h-5 w-5" />
+                <Button size="lg" variant="outline" className="rounded-full border-primary/50 hover:bg-primary/10 text-primary px-4 min-[400px]:px-8 h-12 text-sm min-[400px]:text-base font-bold transition-all hover:scale-105 w-full md:w-auto">
+                  <Info className="mr-2 h-5 w-5 shrink-0" />
                   Tìm hiểu thêm
                 </Button>
               </DialogTrigger>
@@ -100,8 +100,8 @@ export function Universe() {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" className="rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-background px-8 h-12 text-base font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:shadow-primary/40">
-                  <Dices className="mr-2 h-5 w-5" />
+                <Button size="lg" className="rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-background px-4 min-[400px]:px-8 h-12 text-sm min-[400px]:text-base font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:shadow-primary/40 w-full md:w-auto">
+                  <Dices className="mr-2 h-5 w-5 shrink-0" />
                   Quay thưởng ngay
                 </Button>
               </DialogTrigger>
