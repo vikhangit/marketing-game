@@ -1,7 +1,8 @@
 'use client';
 
-import { Infinity, Coins, Zap, Globe, RefreshCcw, Gift, Dices, Ticket, Rocket, Users, ShoppingBag, Info, Trophy, Star } from 'lucide-react';
+import { Infinity, Coins, Zap, Globe, RefreshCcw, Gift, Dices, Ticket, Rocket, Users, ShoppingBag, Info, Trophy, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,12 +12,93 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+interface PlanetVoucher {
+  id: string;
+  title: string;
+  discount: string;
+  color: string;
+  planetColor: string;
+}
+
+const PLANET_VOUCHERS: Record<string, PlanetVoucher[]> = {
+  mars: [ // Life Care (Spa)
+    { id: 'lc1', title: 'Massage chân', discount: 'Giảm 30%', color: 'from-red-500 to-orange-600', planetColor: '' },
+    { id: 'lc2', title: 'Massage Body', discount: 'Voucher 200k', color: 'from-orange-400 to-red-500', planetColor: '' },
+    { id: 'lc3', title: 'Gội đầu thảo dược', discount: 'Tặng kèm', color: 'from-rose-500 to-red-700', planetColor: '' },
+    { id: 'lc4', title: 'Liệu trình giảm mỡ', discount: '-50%', color: 'from-orange-500 to-rose-600', planetColor: '' },
+    { id: 'lc5', title: 'Chăm sóc da mặt', discount: 'Trải nghiệm', color: 'from-red-600 to-orange-700', planetColor: '' },
+  ],
+  neptune: [ // Ecoop (Tổng kho tiêu dùng)
+    { id: 'ec1', title: 'Voucher Trà & Cafe', discount: 'Giảm 20%', color: 'from-blue-500 to-indigo-600', planetColor: '' },
+    { id: 'ec2', title: 'Hóa mỹ phẩm', discount: 'Voucher 50k', color: 'from-indigo-400 to-blue-700', planetColor: '' },
+    { id: 'ec3', title: 'Hàng tiêu dùng', discount: 'Combo tiết kiệm', color: 'from-blue-600 to-cyan-500', planetColor: '' },
+    { id: 'ec4', title: 'Nước giặt xả', discount: 'Mua 1 Tặng 1', color: 'from-cyan-600 to-blue-800', planetColor: '' },
+    { id: 'ec5', title: 'Sữa & Bỉm', discount: 'Giá sỉ', color: 'from-blue-700 to-indigo-900', planetColor: '' },
+  ],
+  saturn: [ // Phở Cô Ba
+    { id: 'pcb1', title: 'Tô đặc biệt', discount: 'Tặng Quẩy', color: 'from-amber-500 to-orange-600', planetColor: '' },
+    { id: 'pcb2', title: 'Voucher Ăn Sáng', discount: 'Giảm 20%', color: 'from-orange-400 to-amber-600', planetColor: '' },
+    { id: 'pcb3', title: 'Combo Gia Đình', discount: '100k', color: 'from-amber-600 to-orange-700', planetColor: '' },
+    { id: 'pcb4', title: 'Nước dùng thêm', discount: 'Free', color: 'from-orange-500 to-amber-500', planetColor: '' },
+    { id: 'pcb5', title: 'Gia vị đặc sản', discount: 'Limited', color: 'from-amber-700 to-orange-800', planetColor: '' },
+  ],
+  venus: [ // ION BẠC
+    { id: 'ib1', title: 'Bình xịt khuẩn', discount: 'Giảm 30%', color: 'from-yellow-400 to-amber-500', planetColor: '' },
+    { id: 'ib2', title: 'Voucher ION BẠC', discount: '50k', color: 'from-amber-300 to-yellow-500', planetColor: '' },
+    { id: 'ib3', title: 'Combo Sạch Sâu', discount: 'Giảm 25%', color: 'from-yellow-500 to-amber-400', planetColor: '' },
+    { id: 'ib4', title: 'Lõi lọc ION', discount: '-15%', color: 'from-amber-500 to-yellow-600', planetColor: '' },
+    { id: 'ib5', title: 'Máy tiệt trùng', discount: 'Voucher 500k', color: 'from-yellow-600 to-amber-700', planetColor: '' },
+  ],
+  uranus: [ // Siêu thị AI
+    { id: 'sai1', title: 'Gạo ST25', discount: 'Giảm 10%', color: 'from-cyan-500 to-blue-600', planetColor: '' },
+    { id: 'sai2', title: 'Nước mắm Nam Ngư', discount: 'Tặng 1 Knorr', color: 'from-blue-400 to-cyan-600', planetColor: '' },
+    { id: 'sai3', title: 'Dầu ăn Tường An', discount: 'Voucher 20k', color: 'from-cyan-600 to-blue-500', planetColor: '' },
+    { id: 'sai4', title: 'Bột giặt OMO', discount: 'Giảm 15.000đ', color: 'from-blue-500 to-cyan-400', planetColor: '' },
+    { id: 'sai5', title: 'Sữa tươi Vinamilk', discount: 'Mua 1 thùng tặng 1', color: 'from-cyan-700 to-blue-800', planetColor: '' },
+  ],
+  earth: [ // Siêu thị 3D (Web ảo - Liên quan vận chuyển)
+    { id: 's3d1', title: 'Đơn hàng thực phẩm', discount: 'Free Ship', color: 'from-green-500 to-emerald-600', planetColor: '' },
+    { id: 's3d2', title: 'Voucher Mua Sắm', discount: 'Giảm 50% Ship', color: 'from-emerald-400 to-green-700', planetColor: '' },
+    { id: 's3d3', title: 'Gạo & Nhu yếu phẩm', discount: 'Giao nhanh 2h', color: 'from-green-600 to-teal-500', planetColor: '' },
+    { id: 's3d4', title: 'Hóa mỹ phẩm 3D', discount: 'Free Ship 0đ', color: 'from-teal-600 to-green-500', planetColor: '' },
+    { id: 's3d5', title: 'Combo tiêu dùng', discount: 'Tặng phí vận chuyển', color: 'from-green-700 to-teal-800', planetColor: '' },
+  ],
+  jupiter: [ // Mộc tinh
+    { id: 'j1', title: 'Linh kiện Mythic', discount: '30%', color: 'from-orange-500 to-amber-700', planetColor: '' },
+    { id: 'j2', title: 'Năng lượng EP', discount: 'x2000', color: 'from-amber-600 to-orange-800', planetColor: '' },
+    { id: 'j3', title: 'Voucher Nâng Cấp', discount: 'Giảm 40%', color: 'from-orange-400 to-amber-500', planetColor: '' },
+  ],
+  mercury: [ // Thủy tinh
+    { id: 'm1', title: 'EP x1000', discount: '25%', color: 'from-gray-400 to-slate-600', planetColor: '' },
+    { id: 'm2', title: 'Tốc độ khai thác', discount: '+10%', color: 'from-slate-500 to-gray-700', planetColor: '' },
+    { id: 'm3', title: 'Voucher SP', discount: '500 SP', color: 'from-gray-600 to-slate-800', planetColor: '' },
+  ],
+  pluto: [ // Diêm Vương tinh
+    { id: 'p1', title: 'Voucher O2O', discount: '20%', color: 'from-slate-600 to-blue-900', planetColor: '' },
+    { id: 'p2', title: 'Rương may mắn', discount: 'Free', color: 'from-blue-900 to-slate-700', planetColor: '' },
+    { id: 'p3', title: 'Linh kiện Rare', discount: '99%', color: 'from-slate-700 to-blue-800', planetColor: '' },
+  ],
+};
+
+interface Planet {
+  id: string;
+  name: string;
+  className: string;
+  planetClass: string;
+  children?: React.ReactNode;
+  voucherPosition: 'left' | 'center' | 'right';
+  availableVouchers: PlanetVoucher[];
+}
+
 export function Universe() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const screenshots = [
-    { src: '/screenshot/buong_lai.jpg', alt: 'Buồng lái' },
+    { src: '/screenshot/buong_lai.png', alt: 'Buồng lái' },
     { src: '/screenshot/hanh_tinh_1.jpg', alt: 'Hành tinh 1' },
-    { src: '/screenshot/hanh_tinh_2.jpg', alt: 'Hành tinh 2' },
-    { src: '/screenshot/hanh_tinh_3.jpg', alt: 'Hành tinh 3' },
     { src: '/screenshot/hanh_tinh_4.png', alt: 'Hành tinh 4' },
     { src: '/screenshot/voucher_1.png', alt: 'Voucher 1' },
     { src: '/screenshot/voucher_2.png', alt: 'Voucher 2' },
@@ -68,7 +150,7 @@ export function Universe() {
   ];
 
   return (
-    <section className="relative pt-24 pb-12 md:py-32 overflow-hidden min-h-[800px] flex flex-col justify-center">
+    <section className="relative pt-24 pb-12 md:py-32 overflow-hidden min-h-[900px] flex flex-col justify-center" suppressHydrationWarning>
       {/* Background with Galaxy Image */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -79,7 +161,7 @@ export function Universe() {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-white to-secondary">
             Chinh phục <span className="text-primary">Vũ trụ ApecSpace</span>
@@ -111,9 +193,79 @@ export function Universe() {
         </div>
 
         {/* Modern Mobile Screenshots Layout */}
-        <div className="relative h-[450px] md:h-[650px] w-full flex items-center justify-center mb-24">
+        <div className="relative h-[600px] md:h-[750px] w-full flex items-center justify-center mb-24 overflow-visible">
+          {/* Realistic Cosmic Planets */}
+          
+          {/* 1. Mars - Reddish (Life Care) */}
+          <PlanetWithVoucher
+            planetId="mars"
+            name="CLB sức khỏe Life Care"
+            className="absolute top-[0%] md:top-[-5%] left-[5%] md:left-[0%]"
+            planetClass="w-16 h-16 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-red-500/90 via-orange-700/80 to-red-950/60 blur-[1px] animate-pulse-slow shadow-[0_0_60px_rgba(220,38,38,0.6)]"
+            voucherPosition="center"
+            animationClass="animate-slide-in-left"
+            autoScrollInterval={2500}
+          />
+          
+          {/* 2. Neptune - Deep Blue (Ecoop) */}
+          <PlanetWithVoucher
+            planetId="neptune"
+            name="Tổng Kho Ecoop"
+            className="absolute bottom-[5%] md:bottom-[-2%] right-[5%] md:right-[0%]"
+            planetClass="w-20 h-20 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-blue-500/90 via-blue-800/80 to-blue-950/60 blur-[1px] animate-bounce-slow shadow-[0_0_80px_rgba(37,99,235,0.6)]"
+            voucherPosition="left"
+            animationClass="animate-slide-in-right"
+            autoScrollInterval={3500}
+          />
+
+          {/* 3. Saturn - Earthy Yellow/Brown (Phở Cô Ba) */}
+          <PlanetWithVoucher
+            planetId="saturn"
+            name="Phở cô ba SG 1972"
+            className="absolute top-[0%] md:top-[-5%] right-[5%] md:right-[0%]"
+            planetClass="w-16 h-16 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-yellow-500/90 via-amber-700/80 to-amber-950/60 blur-[1px] animate-pulse-slow-delayed shadow-[0_0_70px_rgba(217,119,6,0.5)]"
+            voucherPosition="left"
+            animationClass="animate-flip-in"
+            autoScrollInterval={3000}
+            hasRing={true}
+          />
+          
+          {/* 4. Venus - Pale Yellow/Acidic (ION Bạc) */}
+          <PlanetWithVoucher
+            planetId="venus"
+            name="ION BẠC"
+            className="absolute bottom-[5%] md:bottom-[-2%] left-[5%] md:left-[0%]"
+            planetClass="w-18 h-18 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-yellow-100/90 via-yellow-500/80 to-yellow-800/60 blur-[1px] shadow-[0_0_50px_rgba(253,224,71,0.5)]"
+            voucherPosition="right"
+            animationClass="animate-slide-in-up"
+            autoScrollInterval={2800}
+          />
+
+          {/* 5. Uranus - Cyan/Light Blue (Siêu thị AI) */}
+          <PlanetWithVoucher
+            planetId="uranus"
+            name="Siêu thị AI"
+            className="absolute hidden md:flex top-1/2 -translate-y-1/2 left-[-18%] lg:left-[-12%]"
+            planetClass="w-16 h-16 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-cyan-300/90 via-blue-400/80 to-blue-600/60 blur-[1px] animate-pulse-slow shadow-[0_0_45px_rgba(34,211,238,0.5)]"
+            voucherPosition="center"
+            animationClass="animate-zoom-out-in"
+            autoScrollInterval={3200}
+          />
+
+          {/* 6. Earth - Detailed Blue/Green (Siêu thị 3D) */}
+          <PlanetWithVoucher
+            planetId="earth"
+            name="Siêu thị 3D"
+            className="absolute hidden md:flex top-[15%] right-[-18%] lg:right-[-12%]"
+            planetClass="w-20 h-20 md:w-40 md:h-40 rounded-full bg-[#1e3a8a] shadow-[0_0_70px_rgba(59,130,246,0.7)] overflow-hidden border border-blue-400/20"
+            voucherPosition="center"
+            isEarth={true}
+            animationClass="animate-fade-in-scale"
+            autoScrollInterval={2200}
+          />
+
           {/* Main central phone */}
-          <div className="relative z-30 transform transition-all duration-700 hover:scale-105">
+          <div className="relative z-30 transform transition-all duration-700 hover:scale-105 group/phone">
             <div className="w-[180px] h-[360px] md:w-[260px] md:h-[520px] bg-black rounded-[2.5rem] p-3 border-[6px] border-slate-800 shadow-[0_0_50px_rgba(59,130,246,0.3)] overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-slate-800 rounded-b-2xl z-20" />
               <img 
@@ -122,10 +274,18 @@ export function Universe() {
                 className="w-full h-full object-cover rounded-[1.8rem]"
               />
             </div>
+            {/* Spaceship popping out */}
+            <div className="absolute top-[100px] md:top-[145px] left-[-85px] md:left-[-120px] rotate-[15deg] w-[130%] z-40 pointer-events-none transition-transform duration-700 group-hover/phone:scale-105 drop-shadow-[0_0_50px_rgba(59,130,246,0.6)]">
+              <img 
+                src="/screenshot/phi_thuyen.png" 
+                alt="Spaceship" 
+                className="w-full h-auto transform rotate-[-15deg]"
+              />
+            </div>
           </div>
 
           {/* Side phone - Left (Inner) */}
-          <div className="absolute left-1/2 -translate-x-[110%] md:-translate-x-[130%] z-20 rotate-[-10deg] scale-75 min-[376px]:scale-80 md:scale-90 opacity-80 transition-all duration-500 hover:rotate-0 hover:z-40 hover:opacity-100">
+          <div className="absolute left-1/2 -translate-x-[120%] md:-translate-x-[135%] z-20 rotate-[-8deg] scale-75 min-[376px]:scale-80 md:scale-90 opacity-70 transition-all duration-500 hover:rotate-0 hover:z-40 hover:opacity-100">
             <div className="w-[140px] h-[280px] min-[376px]:w-[160px] min-[376px]:h-[320px] md:w-[220px] md:h-[440px] bg-black rounded-[2rem] md:rounded-[2.2rem] p-2 border-[4px] md:border-[5px] border-slate-800 shadow-2xl overflow-hidden">
               <img 
                 src={screenshots[1].src} 
@@ -136,7 +296,7 @@ export function Universe() {
           </div>
 
           {/* Side phone - Right (Inner) */}
-          <div className="absolute left-1/2 translate-x-[10%] md:translate-x-[30%] z-20 rotate-[10deg] scale-75 min-[376px]:scale-80 md:scale-90 opacity-80 transition-all duration-500 hover:rotate-0 hover:z-40 hover:opacity-100">
+          <div className="absolute left-1/2 translate-x-[20%] md:translate-x-[35%] z-20 rotate-[8deg] scale-75 min-[376px]:scale-80 md:scale-90 opacity-70 transition-all duration-500 hover:rotate-0 hover:z-40 hover:opacity-100">
             <div className="w-[140px] h-[280px] min-[376px]:w-[160px] min-[376px]:h-[320px] md:w-[220px] md:h-[440px] bg-black rounded-[2rem] md:rounded-[2.2rem] p-2 border-[4px] md:border-[5px] border-slate-800 shadow-2xl overflow-hidden">
               <img 
                 src={screenshots[2].src} 
@@ -146,48 +306,6 @@ export function Universe() {
             </div>
           </div>
 
-          {/* Distant phone - Left (Outer) */}
-          <div className="absolute left-1/2 -translate-x-[170%] min-[376px]:-translate-x-[190%] md:-translate-x-[220%] z-10 rotate-[-20deg] scale-55 min-[376px]:scale-60 md:scale-70 opacity-70 transition-all duration-700 hover:rotate-0 hover:z-40 hover:opacity-100">
-            <div className="w-[130px] h-[260px] min-[376px]:w-[150px] min-[376px]:h-[300px] md:w-[200px] md:h-[400px] bg-black rounded-[1.8rem] md:rounded-[2rem] p-2 border-[3px] md:border-[4px] border-slate-800 shadow-xl overflow-hidden">
-              <img 
-                src={screenshots[3].src} 
-                alt={screenshots[3].alt}
-                className="w-full h-full object-cover rounded-[1.2rem] md:rounded-[1.4rem]"
-              />
-            </div>
-          </div>
-
-          {/* Distant phone - Right (Outer) */}
-          <div className="absolute left-1/2 translate-x-[70%] min-[376px]:translate-x-[90%] md:translate-x-[120%] z-10 rotate-[20deg] scale-55 min-[376px]:scale-60 md:scale-70 opacity-70 transition-all duration-700 hover:rotate-0 hover:z-40 hover:opacity-100">
-            <div className="w-[130px] h-[260px] min-[376px]:w-[150px] min-[376px]:h-[300px] md:w-[200px] md:h-[400px] bg-black rounded-[1.8rem] md:rounded-[2rem] p-2 border-[3px] md:border-[4px] border-slate-800 shadow-xl overflow-hidden">
-              <img 
-                src={screenshots[4].src} 
-                alt={screenshots[4].alt}
-                className="w-full h-full object-cover rounded-[1.2rem] md:rounded-[1.4rem]"
-              />
-            </div>
-          </div>
-
-          {/* Floating Vouchers */}
-          <div className="absolute bottom-0 -left-12 min-[376px]:-left-8 md:left-0 z-40 rotate-[-15deg] animate-bounce-slow scale-65 min-[376px]:scale-75 md:scale-90">
-             <div className="w-[120px] h-[200px] md:w-[170px] md:h-[270px] bg-black rounded-[1.5rem] p-1.5 border-[4px] border-slate-800 shadow-2xl overflow-hidden">
-                <img 
-                  src={screenshots[5].src} 
-                  alt={screenshots[5].alt}
-                  className="w-full h-full object-cover rounded-[1rem]"
-                />
-             </div>
-          </div>
-
-          <div className="absolute top-0 -right-12 min-[376px]:-right-8 md:right-0 z-40 rotate-[15deg] animate-bounce-slow-delayed scale-65 min-[376px]:scale-75 md:scale-90">
-             <div className="w-[120px] h-[200px] md:w-[170px] md:h-[270px] bg-black rounded-[1.5rem] p-1.5 border-[4px] border-slate-800 shadow-2xl overflow-hidden">
-                <img 
-                  src={screenshots[6].src} 
-                  alt={screenshots[6].alt}
-                  className="w-full h-full object-cover rounded-[1rem]"
-                />
-             </div>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 min-[376px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -224,6 +342,98 @@ export function Universe() {
         </div>
       </div>
     </section>
+  );
+}
+
+function PlanetWithVoucher({
+  planetId,
+  name,
+  className,
+  planetClass,
+  voucherPosition,
+  animationClass = 'animate-fade-in-scale',
+  autoScrollInterval = 3000,
+  hasRing = false,
+  hasStripes = false,
+  isEarth = false,
+}: {
+  planetId: string;
+  name: string;
+  className: string;
+  planetClass: string;
+  voucherPosition: 'left' | 'center' | 'right';
+  animationClass?: string;
+  autoScrollInterval?: number;
+  hasRing?: boolean;
+  hasStripes?: boolean;
+  isEarth?: boolean;
+}) {
+  const [index, setIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  const vouchers = PLANET_VOUCHERS[planetId] || [];
+
+  useEffect(() => {
+    setMounted(true);
+    if (vouchers.length <= 1) return;
+    const intervalId = setInterval(() => {
+      setIndex((prev) => (prev + 1) % vouchers.length);
+    }, autoScrollInterval);
+    return () => clearInterval(intervalId);
+  }, [vouchers.length, autoScrollInterval]);
+
+  if (!mounted) return null;
+
+  const currentVoucher = vouchers[index];
+  if (!currentVoucher) return null;
+
+  const voucherPositionClass = {
+    left: 'left-[-15%] top-1/3 -rotate-[12deg]',
+    center: 'left-1/2 -translate-x-1/2 bottom-[5%]',
+    right: 'right-[-15%] top-1/3 rotate-[12deg]',
+  };
+
+  return (
+    <div className={`${className} group/planet z-10`} suppressHydrationWarning>
+      <div className="relative">
+        {name && (
+          <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-white/20 whitespace-nowrap z-[110] shadow-lg">
+            <span className="text-white font-bold text-[8px] md:text-[12px] uppercase tracking-wider">{name}</span>
+          </div>
+        )}
+        <div className={`${planetClass} relative flex items-center justify-center`}>
+          {isEarth && (
+            <>
+              <div className="absolute top-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-600/60 rounded-full blur-md rotate-[-20deg]" />
+              <div className="absolute bottom-[15%] right-[10%] w-[40%] h-[50%] bg-green-700/50 rounded-full blur-md rotate-[10deg]" />
+              <div className="absolute top-[40%] left-[10%] w-[30%] h-[20%] bg-green-600/40 rounded-full blur-sm" />
+              <div className="absolute inset-0 opacity-40 animate-pulse-slow">
+                <div className="absolute top-[5%] left-[30%] w-[60%] h-[15%] bg-white/60 rounded-full blur-sm rotate-[5deg]" />
+                <div className="absolute bottom-[20%] left-[10%] w-[50%] h-[10%] bg-white/40 rounded-full blur-sm rotate-[-10deg]" />
+                <div className="absolute top-[40%] right-[5%] w-[40%] h-[12%] bg-white/50 rounded-full blur-sm" />
+              </div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3),transparent_70%)]" />
+              <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]" />
+            </>
+          )}
+          {hasRing && (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[15%] border-[2px] md:border-[3px] border-amber-400/40 rounded-[100%] rotate-[25deg] shadow-[0_0_20px_rgba(251,191,36,0.3)]" />
+          )}
+          {hasStripes && (
+            <>
+              <div className="absolute top-[30%] left-0 w-full h-[10%] bg-black/10" />
+              <div className="absolute top-[60%] left-0 w-full h-[15%] bg-black/10" />
+            </>
+          )}
+        </div>
+
+        <div className={`absolute ${voucherPositionClass[voucherPosition]} transition-all duration-300 flex items-center gap-1 group/voucher z-[100]`}>
+          <div key={`${planetId}-${index}`} className={`bg-gradient-to-r ${currentVoucher.color} px-2 md:px-3 py-0.5 md:py-1 rounded-md md:rounded-lg border-2 border-white whitespace-nowrap min-w-max shadow-[0_0_20px_rgba(0,0,0,0.5)] ${animationClass}`}>
+            <div className="text-white font-black text-[8px] md:text-[12px] uppercase tracking-widest drop-shadow-md">{currentVoucher.title}</div>
+            <div className="text-white font-black text-xs md:text-lg text-center drop-shadow-md">{currentVoucher.discount}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

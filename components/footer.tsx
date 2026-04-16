@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-gradient-to-b from-transparent to-card/20 py-8 px-4 sm:px-6 lg:px-8">
+    <footer className="border-t border-border bg-gradient-to-b from-transparent to-card/20 py-8 px-4 sm:px-6 lg:px-8" suppressHydrationWarning={true}>
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
