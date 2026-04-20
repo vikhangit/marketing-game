@@ -189,7 +189,7 @@
 @layer utilities {
   /* Core Voucher Base */
   .voucher-base {
-    @apply relative flex flex-col items-center justify-center px-10 py-4 min-w-[200px] md:min-w-[300px] shadow-2xl transition-all duration-300;
+    @apply relative flex flex-col items-center justify-center px-12 py-4 min-w-[250px] md:min-w-[400px] shadow-2xl transition-all duration-300;
     transform-style: preserve-3d;
   }
 

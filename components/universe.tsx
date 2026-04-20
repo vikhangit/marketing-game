@@ -2,7 +2,7 @@
 
 import { Infinity, Coins, Zap, Globe, RefreshCcw, Gift, Dices, Ticket, Rocket, Users, ShoppingBag, Info, Trophy, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -61,7 +61,6 @@ const PLANET_VOUCHERS: Record<string, PlanetVoucher[]> = {
     { id: 's3d2', title: 'Voucher Mua Sắm', discount: 'Giảm 50% Ship', color: 'from-emerald-400 to-green-700', planetColor: '' },
     { id: 's3d3', title: 'Gạo & Nhu yếu phẩm', discount: 'Giao nhanh 2h', color: 'from-green-600 to-teal-500', planetColor: '' },
     { id: 's3d4', title: 'Hóa mỹ phẩm 3D', discount: 'Free Ship 0đ', color: 'from-teal-600 to-green-500', planetColor: '' },
-    { id: 's3d5', title: 'Combo tiêu dùng', discount: 'Tặng phí vận chuyển', color: 'from-green-700 to-teal-800', planetColor: '' },
   ],
   jupiter: [ // Mộc tinh
     { id: 'j1', title: 'Linh kiện Mythic', discount: '30%', color: 'from-orange-500 to-amber-700', planetColor: '' },
@@ -92,36 +91,51 @@ interface Planet {
 
 export function Universe() {
   const [mounted, setMounted] = useState(false);
-  const [vouchIndex1, setVouchIndex1] = useState(0);
-  const [vouchIndex2, setVouchIndex2] = useState(0);
+  const [vouchIndex, setVouchIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
 
   // Group and shuffle all vouchers from planets, excluding component vouchers
-  const allVouchers = Object.entries(PLANET_VOUCHERS)
-    .flatMap(([planetId, vouchers]) => vouchers.map(v => ({ ...v, planetId })))
-    .filter(v => !v.title.toLowerCase().includes('linh kiện'))
-    .sort(() => Math.random() - 0.5);
-
-  // Split vouchers between the two central slots
-  const half = Math.ceil(allVouchers.length / 2);
-  const vouchersGroup1 = allVouchers.slice(0, half);
-  const vouchersGroup2 = allVouchers.slice(half);
+  const allVouchers = useMemo(() => {
+    return Object.entries(PLANET_VOUCHERS)
+      .flatMap(([planetId, vouchers]) => vouchers.map(v => ({ ...v, planetId })))
+      .filter(v => !v.title.toLowerCase().includes('linh kiện'))
+      .sort(() => 0.5 - Math.random());
+  }, []);
 
   useEffect(() => {
     setMounted(true);
-    
-    const interval1 = setInterval(() => {
-      setVouchIndex1(prev => (prev + 1) % vouchersGroup1.length);
-    }, 3000);
+    if (allVouchers.length === 0) return;
 
-    const interval2 = setInterval(() => {
-      setVouchIndex2(prev => (prev + 1) % vouchersGroup2.length);
-    }, 3500);
+    let timer: NodeJS.Timeout;
+    let fadeTimer: NodeJS.Timeout;
+    let hiddenTimer: NodeJS.Timeout;
 
-    return () => {
-      clearInterval(interval1);
-      clearInterval(interval2);
+    const startCycle = () => {
+      // 1. Voucher hiển thị rõ (10s fade-in + 10s show = 20s)
+      setIsFading(false);
+      
+      timer = setTimeout(() => {
+        // 2. Bắt đầu mờ dần (mất 10 giây)
+        setIsFading(true);
+        
+        fadeTimer = setTimeout(() => {
+          // 3. Sau khi mờ hẳn, chờ thêm 1 giây (ẩn hoàn toàn)
+          hiddenTimer = setTimeout(() => {
+            // 4. Đổi sang cặp voucher tiếp theo và bắt đầu lại vòng lặp
+            setVouchIndex(prev => (prev + 2) % allVouchers.length);
+            startCycle();
+          }, 1000);
+        }, 10000); // fade out time
+      }, 20000); // fade in (10s) + show (10s)
     };
-  }, [vouchersGroup1.length, vouchersGroup2.length]);
+
+    startCycle();
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(fadeTimer);
+      clearTimeout(hiddenTimer);
+    };
+  }, [allVouchers.length]);
 
   const getVoucherTheme = (planetId: string) => {
     const planetStyles: Record<string, { className: string; text: string; label: string }> = {
@@ -135,10 +149,10 @@ export function Universe() {
     return planetStyles[planetId] || planetStyles.mars;
   };
 
-  if (!mounted) return null;
+  if (!mounted || allVouchers.length === 0) return null;
 
-  const currentV1 = vouchersGroup1[vouchIndex1];
-  const currentV2 = vouchersGroup2[vouchIndex2];
+  const currentV1 = allVouchers[vouchIndex];
+  const currentV2 = allVouchers[(vouchIndex + 1) % allVouchers.length];
   const theme1 = getVoucherTheme(currentV1.planetId);
   const theme2 = getVoucherTheme(currentV2.planetId);
 
@@ -197,14 +211,15 @@ export function Universe() {
 
   return (
     <section className="relative pt-24 pb-12 md:py-32 overflow-hidden min-h-[900px] flex flex-col justify-center" suppressHydrationWarning>
-      {/* Background with Galaxy Image */}
-      <div className="absolute inset-0 z-0">
+      {/* Background with Galaxy Image - Darkened further */}
+      <div className="absolute inset-0 z-0 bg-[#000000]">
         <img 
           src="/galaxy.jpg" 
           alt="Galaxy Background" 
-          className="w-full h-full object-cover opacity-80"
+          className="w-full h-full object-cover opacity-10 mix-blend-screen"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black opacity-100" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000000_100%)] opacity-100" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
@@ -242,23 +257,22 @@ export function Universe() {
         <div className="relative h-[650px] md:h-[850px] w-full flex items-center justify-center mb-2 md:mb-24 overflow-visible">
           
           {/* Top Stat: Hàng ngàn Hành tinh dịch vụ */}
-          <div className="absolute top-[80px] md:top-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+          <div className="absolute top-[60px] md:top-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
             <div className="relative inline-block">
-              <h3 className="text-2xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-primary/20 drop-shadow-[0_0_30px_rgba(0,217,255,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+              <h3 className="text-4xl min-[350px]:text-6xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-primary/20 drop-shadow-[0_0_30px_rgba(0,217,255,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
                 Hàng ngàn
               </h3>
             </div>
             <div className="mt-1 md:mt-2 flex flex-col items-center">
-              
-              <p className="text-[10px] sm:text-sm md:text-xl  font-bold text-primary tracking-wide uppercase italic whitespace-nowrap">Hành tinh dịch vụ</p>
+              <p className="text-lg min-[350px]:text-xl md:text-xl font-bold text-primary tracking-wide uppercase italic whitespace-nowrap">Hành tinh dịch vụ</p>
             </div>
           </div>
 
           {/* 1. Mars - Reddish (Life Care) */}
           <PlanetWithVoucher
             planetId="mars"
-            name="CLB sức khỏe Life Care"
-            className="absolute top-[5%] md:top-[-5%] left-[2%] md:left-[0%]"
+            name="Life Care"
+            className="absolute top-[20%] md:top-[-8%] left-[5%] min-[391px]:left-[13%] md:left-[-5%]"
             planetClass="w-16 h-16 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-red-500 via-orange-700 to-red-950 animate-pulse-slow shadow-[0_0_60px_rgba(220,38,38,0.6)]"
             voucherPosition="center"
             animationClass="animate-slide-in-left"
@@ -269,7 +283,7 @@ export function Universe() {
           <PlanetWithVoucher
             planetId="neptune"
             name="Tổng Kho Ecoop"
-            className="absolute bottom-[5%] md:bottom-[-2%] right-[2%] md:right-[0%]"
+            className="absolute bottom-[20%] md:bottom-[-5%] right-[5%] min-[391px]:right-[13%] md:right-[-5%]"
             planetClass="w-20 h-20 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-blue-500 via-blue-800 to-blue-950 animate-bounce-slow shadow-[0_0_80px_rgba(37,99,235,0.6)]"
             voucherPosition="left"
             animationClass="animate-slide-in-right"
@@ -279,8 +293,8 @@ export function Universe() {
           {/* 3. Saturn - Earthy Yellow/Brown (Phở Cô Ba) */}
           <PlanetWithVoucher
             planetId="saturn"
-            name="Phở cô ba SG 1972"
-            className="absolute top-[5%] md:top-[-5%] right-[2%] md:right-[0%]"
+            name="Cây xăng"
+            className="absolute top-[20%] md:top-[-8%] right-[5%] min-[391px]:right-[13%] md:right-[-5%]"
             planetClass="w-16 h-16 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-yellow-500 via-amber-700 to-amber-950 animate-pulse-slow-delayed shadow-[0_0_70px_rgba(217,119,6,0.5)]"
             voucherPosition="left"
             animationClass="animate-flip-in"
@@ -291,8 +305,8 @@ export function Universe() {
           {/* 4. Venus - Pale Yellow/Acidic (ION Bạc) */}
           <PlanetWithVoucher
             planetId="venus"
-            name="ION BẠC"
-            className="absolute bottom-[5%] md:bottom-[-2%] left-[2%] md:left-[0%]"
+            name="Phòng Khám Đa Khoa"
+            className="absolute bottom-[20%] md:bottom-[-5%] left-[5%] min-[391px]:left-[13%] md:left-[-5%]"
             planetClass="w-18 h-18 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-yellow-100 via-yellow-500 to-yellow-800 shadow-[0_0_50px_rgba(253,224,71,0.5)]"
             voucherPosition="right"
             animationClass="animate-slide-in-up"
@@ -367,15 +381,15 @@ export function Universe() {
 
           {/* Vouchers moved to a global container for higher z-index (above side phones on hover) */}
           <div className="absolute inset-0 z-[100] pointer-events-none flex items-center justify-center overflow-visible">
-            <div className="relative w-[180px] h-[360px] md:w-[260px] md:h-[520px]">
+            <div className={`relative w-[180px] h-[360px] md:w-[260px] md:h-[520px] transition-opacity ease-in-out ${isFading ? 'duration-[10000ms] opacity-0' : 'duration-[10000ms] opacity-100'}`}>
               {/* Voucher 1: Dynamic Slider 1 - Fixed position */}
-              <div className="absolute left-[-135px] md:left-[-215px] top-[-30px] md:top-[-50px] rotate-[-25deg] scale-[0.6] md:scale-75 origin-right">
-                <div key={vouchIndex1} className="voucher-base planet-1 animate-fade-in-scale">
+              <div className="absolute left-[-175px] md:left-[-250px] top-[5px] md:top-[-5px] scale-[0.6] md:scale-75 origin-right">
+                <div className="voucher-base planet-1">
                   <div className="relative z-10 text-center flex flex-col items-center justify-center">
-                    <span className="font-bold text-[8px] md:text-[11px] text-white/80 uppercase tracking-widest mb-1">
+                    <span className="font-bold text-[14px] md:text-[18px] text-white/80 uppercase tracking-widest mb-1">
                       {currentV1.title}
                     </span>
-                    <span className="font-black text-[16px] md:text-[24px] text-white leading-none tracking-tighter uppercase">
+                    <span className="font-black text-[22px] md:text-[32px] text-white leading-none tracking-tighter uppercase">
                       {currentV1.discount}
                     </span>
                   </div>
@@ -383,13 +397,13 @@ export function Universe() {
               </div>
 
               {/* Voucher 2: Dynamic Slider 2 - Fixed position */}
-              <div className="absolute right-[-140px] md:right-[-170px] bottom-[-30px] md:bottom-[-40px] rotate-[-30deg] scale-[0.6] md:scale-85 origin-left">
-                <div key={vouchIndex2} className="voucher-base planet-3 animate-fade-in-scale">
+              <div className="absolute right-[-175px] md:right-[-270px] bottom-[5px] scale-[0.6] md:scale-75 origin-left">
+                <div className="voucher-base planet-3">
                   <div className="relative z-10 text-center flex flex-col items-center justify-center">
-                    <span className="font-bold text-[8px] md:text-[11px] text-[#00ff88]/70 uppercase tracking-widest mb-1">
+                    <span className="font-bold text-[14px] md:text-[18px] text-[#00ff88]/70 uppercase tracking-widest mb-1">
                       {currentV2.title}
                     </span>
-                    <span className="font-black text-[16px] md:text-[24px] text-[#00ff88] leading-none tracking-tighter uppercase">
+                    <span className="font-black text-[22px] md:text-[32px] text-[#00ff88] leading-none tracking-tighter uppercase">
                       {currentV2.discount}
                     </span>
                   </div>
@@ -399,15 +413,14 @@ export function Universe() {
           </div>
 
           {/* Bottom Stat: Hàng triệu Ưu đãi, voucher miễn phí */}
-          <div className="absolute bottom-[80px] md:bottom-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+          <div className="absolute bottom-[60px] md:bottom-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
             <div className="relative inline-block">
-              <h3 className="text-2xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-accent/20 drop-shadow-[0_0_30px_rgba(255,107,53,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+              <h3 className="text-4xl min-[350px]:text-6xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-accent/20 drop-shadow-[0_0_30px_rgba(255,107,53,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
                 Hàng triệu
               </h3>
             </div>
             <div className="mt-1 md:mt-2 flex flex-col items-center">
-             
-              <p className="text-[10px] sm:text-sm md:text-xl font-bold text-green-400 tracking-wide uppercase italic whitespace-nowrap">Ưu đãi, voucher miễn phí</p>
+              <p className="text-lg min-[350px]:text-xl md:text-xl font-bold text-green-400 tracking-wide uppercase italic whitespace-nowrap">Ưu đãi, voucher miễn phí</p>
             </div>
           </div>
         </div>
@@ -545,12 +558,14 @@ function PlanetWithVoucher({
   return (
     <div className={`${className} group/planet z-40`} suppressHydrationWarning>
       <div className="relative">
-        {name && (
-          <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-white/20 whitespace-nowrap z-[110] shadow-lg">
-            <span className="text-white font-bold text-[8px] md:text-[12px] uppercase tracking-wider">{name}</span>
-          </div>
-        )}
-        <div className={`${planetClass} relative flex items-center justify-center`}>
+        <div className={`${planetClass} relative flex items-center justify-center text-center p-2`}>
+          {name && (
+            <div className="relative z-[110] px-1 md:px-2">
+              <span className="text-white font-black text-[7px] md:text-[11px] uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight block">
+                {name}
+              </span>
+            </div>
+          )}
           {isEarth && (
             <>
               <div className="absolute top-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-600/80 rounded-full blur-md rotate-[-20deg]" />
