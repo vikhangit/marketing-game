@@ -92,9 +92,55 @@ interface Planet {
 
 export function Universe() {
   const [mounted, setMounted] = useState(false);
+  const [vouchIndex1, setVouchIndex1] = useState(0);
+  const [vouchIndex2, setVouchIndex2] = useState(0);
+
+  // Group and shuffle all vouchers from planets, excluding component vouchers
+  const allVouchers = Object.entries(PLANET_VOUCHERS)
+    .flatMap(([planetId, vouchers]) => vouchers.map(v => ({ ...v, planetId })))
+    .filter(v => !v.title.toLowerCase().includes('linh kiện'))
+    .sort(() => Math.random() - 0.5);
+
+  // Split vouchers between the two central slots
+  const half = Math.ceil(allVouchers.length / 2);
+  const vouchersGroup1 = allVouchers.slice(0, half);
+  const vouchersGroup2 = allVouchers.slice(half);
+
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    const interval1 = setInterval(() => {
+      setVouchIndex1(prev => (prev + 1) % vouchersGroup1.length);
+    }, 3000);
+
+    const interval2 = setInterval(() => {
+      setVouchIndex2(prev => (prev + 1) % vouchersGroup2.length);
+    }, 3500);
+
+    return () => {
+      clearInterval(interval1);
+      clearInterval(interval2);
+    };
+  }, [vouchersGroup1.length, vouchersGroup2.length]);
+
+  const getVoucherTheme = (planetId: string) => {
+    const planetStyles: Record<string, { className: string; text: string; label: string }> = {
+      mars: { className: 'planet-1', text: 'text-white', label: 'text-white/80' },
+      neptune: { className: 'planet-6', text: 'text-[#eee]', label: 'text-white/60' },
+      saturn: { className: 'planet-3', text: 'text-[#00ff88]', label: 'text-[#00ff88]/70' },
+      venus: { className: 'planet-4', text: 'text-[#880e4f]', label: 'text-[#ad1457]/80' },
+      uranus: { className: 'planet-5', text: 'text-[#333]', label: 'text-[#666]/80' },
+      earth: { className: 'planet-2', text: 'text-white', label: 'text-white/70' },
+    };
+    return planetStyles[planetId] || planetStyles.mars;
+  };
+
+  if (!mounted) return null;
+
+  const currentV1 = vouchersGroup1[vouchIndex1];
+  const currentV2 = vouchersGroup2[vouchIndex2];
+  const theme1 = getVoucherTheme(currentV1.planetId);
+  const theme2 = getVoucherTheme(currentV2.planetId);
 
   const screenshots = [
     { src: '/screenshot/buong_lai.png', alt: 'Buồng lái' },
@@ -156,7 +202,7 @@ export function Universe() {
         <img 
           src="/galaxy.jpg" 
           alt="Galaxy Background" 
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-80"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
       </div>
@@ -193,15 +239,27 @@ export function Universe() {
         </div>
 
         {/* Modern Mobile Screenshots Layout */}
-        <div className="relative h-[600px] md:h-[750px] w-full flex items-center justify-center mb-24 overflow-visible">
-          {/* Realistic Cosmic Planets */}
+        <div className="relative h-[650px] md:h-[850px] w-full flex items-center justify-center mb-2 md:mb-24 overflow-visible">
           
+          {/* Top Stat: Hàng ngàn Hành tinh dịch vụ */}
+          <div className="absolute top-[80px] md:top-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+            <div className="relative inline-block">
+              <h3 className="text-2xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-primary/20 drop-shadow-[0_0_30px_rgba(0,217,255,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+                Hàng ngàn
+              </h3>
+            </div>
+            <div className="mt-1 md:mt-2 flex flex-col items-center">
+              
+              <p className="text-[10px] sm:text-sm md:text-xl  font-bold text-primary tracking-wide uppercase italic whitespace-nowrap">Hành tinh dịch vụ</p>
+            </div>
+          </div>
+
           {/* 1. Mars - Reddish (Life Care) */}
           <PlanetWithVoucher
             planetId="mars"
             name="CLB sức khỏe Life Care"
-            className="absolute top-[0%] md:top-[-5%] left-[5%] md:left-[0%]"
-            planetClass="w-16 h-16 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-red-500/90 via-orange-700/80 to-red-950/60 blur-[1px] animate-pulse-slow shadow-[0_0_60px_rgba(220,38,38,0.6)]"
+            className="absolute top-[5%] md:top-[-5%] left-[2%] md:left-[0%]"
+            planetClass="w-16 h-16 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-red-500 via-orange-700 to-red-950 animate-pulse-slow shadow-[0_0_60px_rgba(220,38,38,0.6)]"
             voucherPosition="center"
             animationClass="animate-slide-in-left"
             autoScrollInterval={2500}
@@ -211,8 +269,8 @@ export function Universe() {
           <PlanetWithVoucher
             planetId="neptune"
             name="Tổng Kho Ecoop"
-            className="absolute bottom-[5%] md:bottom-[-2%] right-[5%] md:right-[0%]"
-            planetClass="w-20 h-20 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-blue-500/90 via-blue-800/80 to-blue-950/60 blur-[1px] animate-bounce-slow shadow-[0_0_80px_rgba(37,99,235,0.6)]"
+            className="absolute bottom-[5%] md:bottom-[-2%] right-[2%] md:right-[0%]"
+            planetClass="w-20 h-20 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-blue-500 via-blue-800 to-blue-950 animate-bounce-slow shadow-[0_0_80px_rgba(37,99,235,0.6)]"
             voucherPosition="left"
             animationClass="animate-slide-in-right"
             autoScrollInterval={3500}
@@ -222,8 +280,8 @@ export function Universe() {
           <PlanetWithVoucher
             planetId="saturn"
             name="Phở cô ba SG 1972"
-            className="absolute top-[0%] md:top-[-5%] right-[5%] md:right-[0%]"
-            planetClass="w-16 h-16 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-yellow-500/90 via-amber-700/80 to-amber-950/60 blur-[1px] animate-pulse-slow-delayed shadow-[0_0_70px_rgba(217,119,6,0.5)]"
+            className="absolute top-[5%] md:top-[-5%] right-[2%] md:right-[0%]"
+            planetClass="w-16 h-16 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-yellow-500 via-amber-700 to-amber-950 animate-pulse-slow-delayed shadow-[0_0_70px_rgba(217,119,6,0.5)]"
             voucherPosition="left"
             animationClass="animate-flip-in"
             autoScrollInterval={3000}
@@ -234,8 +292,8 @@ export function Universe() {
           <PlanetWithVoucher
             planetId="venus"
             name="ION BẠC"
-            className="absolute bottom-[5%] md:bottom-[-2%] left-[5%] md:left-[0%]"
-            planetClass="w-18 h-18 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-yellow-100/90 via-yellow-500/80 to-yellow-800/60 blur-[1px] shadow-[0_0_50px_rgba(253,224,71,0.5)]"
+            className="absolute bottom-[5%] md:bottom-[-2%] left-[2%] md:left-[0%]"
+            planetClass="w-18 h-18 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-yellow-100 via-yellow-500 to-yellow-800 shadow-[0_0_50px_rgba(253,224,71,0.5)]"
             voucherPosition="right"
             animationClass="animate-slide-in-up"
             autoScrollInterval={2800}
@@ -246,7 +304,7 @@ export function Universe() {
             planetId="uranus"
             name="Siêu thị AI"
             className="absolute hidden md:flex top-1/2 -translate-y-1/2 left-[-18%] lg:left-[-12%]"
-            planetClass="w-16 h-16 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-cyan-300/90 via-blue-400/80 to-blue-600/60 blur-[1px] animate-pulse-slow shadow-[0_0_45px_rgba(34,211,238,0.5)]"
+            planetClass="w-16 h-16 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-cyan-300 via-blue-400 to-blue-600 animate-pulse-slow shadow-[0_0_45px_rgba(34,211,238,0.5)]"
             voucherPosition="center"
             animationClass="animate-zoom-out-in"
             autoScrollInterval={3200}
@@ -274,6 +332,7 @@ export function Universe() {
                 className="w-full h-full object-cover rounded-[1.8rem]"
               />
             </div>
+
             {/* Spaceship popping out */}
             <div className="absolute top-[100px] md:top-[145px] left-[-85px] md:left-[-120px] rotate-[15deg] w-[130%] z-40 pointer-events-none transition-transform duration-700 group-hover/phone:scale-105 drop-shadow-[0_0_50px_rgba(59,130,246,0.6)]">
               <img 
@@ -306,6 +365,51 @@ export function Universe() {
             </div>
           </div>
 
+          {/* Vouchers moved to a global container for higher z-index (above side phones on hover) */}
+          <div className="absolute inset-0 z-[100] pointer-events-none flex items-center justify-center overflow-visible">
+            <div className="relative w-[180px] h-[360px] md:w-[260px] md:h-[520px]">
+              {/* Voucher 1: Dynamic Slider 1 - Fixed position */}
+              <div className="absolute left-[-135px] md:left-[-215px] top-[-30px] md:top-[-50px] rotate-[-25deg] scale-[0.6] md:scale-75 origin-right">
+                <div key={vouchIndex1} className="voucher-base planet-1 animate-fade-in-scale">
+                  <div className="relative z-10 text-center flex flex-col items-center justify-center">
+                    <span className="font-bold text-[8px] md:text-[11px] text-white/80 uppercase tracking-widest mb-1">
+                      {currentV1.title}
+                    </span>
+                    <span className="font-black text-[16px] md:text-[24px] text-white leading-none tracking-tighter uppercase">
+                      {currentV1.discount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Voucher 2: Dynamic Slider 2 - Fixed position */}
+              <div className="absolute right-[-140px] md:right-[-170px] bottom-[-30px] md:bottom-[-40px] rotate-[-30deg] scale-[0.6] md:scale-85 origin-left">
+                <div key={vouchIndex2} className="voucher-base planet-3 animate-fade-in-scale">
+                  <div className="relative z-10 text-center flex flex-col items-center justify-center">
+                    <span className="font-bold text-[8px] md:text-[11px] text-[#00ff88]/70 uppercase tracking-widest mb-1">
+                      {currentV2.title}
+                    </span>
+                    <span className="font-black text-[16px] md:text-[24px] text-[#00ff88] leading-none tracking-tighter uppercase">
+                      {currentV2.discount}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Stat: Hàng triệu Ưu đãi, voucher miễn phí */}
+          <div className="absolute bottom-[80px] md:bottom-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+            <div className="relative inline-block">
+              <h3 className="text-2xl sm:text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-accent/20 drop-shadow-[0_0_30px_rgba(255,107,53,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+                Hàng triệu
+              </h3>
+            </div>
+            <div className="mt-1 md:mt-2 flex flex-col items-center">
+             
+              <p className="text-[10px] sm:text-sm md:text-xl font-bold text-green-400 tracking-wide uppercase italic whitespace-nowrap">Ưu đãi, voucher miễn phí</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 min-[376px]:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -386,14 +490,60 @@ function PlanetWithVoucher({
   const currentVoucher = vouchers[index];
   if (!currentVoucher) return null;
 
+  const getTicketTheme = (id: string) => {
+    const planetStyles: Record<string, { className: string; text: string; label: string; rotate: string }> = {
+      mars: { 
+        className: 'planet-1', 
+        text: 'text-white', 
+        label: 'text-white/80',
+        rotate: 'rotate-[-6deg]'
+      },
+      neptune: { 
+        className: 'planet-6', 
+        text: 'text-[#eee]', 
+        label: 'text-white/60',
+        rotate: 'rotate-[3deg]'
+      },
+      saturn: { 
+        className: 'planet-3', 
+        text: 'text-[#00ff88]', 
+        label: 'text-[#00ff88]/70',
+        rotate: 'rotate-[-3deg]'
+      },
+      venus: { 
+        className: 'planet-4', 
+        text: 'text-[#880e4f]', 
+        label: 'text-[#ad1457]/80',
+        rotate: 'rotate-[5deg]'
+      },
+      uranus: { 
+        className: 'planet-5', 
+        text: 'text-[#333]', 
+        label: 'text-[#666]/80',
+        rotate: 'rotate-[-2deg]'
+      },
+      earth: { 
+        className: 'planet-2', 
+        text: 'text-white', 
+        label: 'text-white/70',
+        rotate: 'rotate-[4deg]'
+      },
+    };
+
+    const style = planetStyles[id] || planetStyles.mars;
+    return style;
+  };
+
+  const theme = getTicketTheme(planetId);
+
   const voucherPositionClass = {
-    left: 'left-[-15%] top-1/3 -rotate-[12deg]',
-    center: 'left-1/2 -translate-x-1/2 bottom-[5%]',
-    right: 'right-[-15%] top-1/3 rotate-[12deg]',
+    left: `left-[-5%] md:left-[-15%] top-1/3 ${theme.rotate} scale-95`,
+    center: `left-1/2 -translate-x-1/2 bottom-[-10%] md:bottom-[-15%] ${theme.rotate}`,
+    right: `right-[-5%] md:right-[-15%] top-1/3 ${theme.rotate} scale-105`,
   };
 
   return (
-    <div className={`${className} group/planet z-10`} suppressHydrationWarning>
+    <div className={`${className} group/planet z-40`} suppressHydrationWarning>
       <div className="relative">
         {name && (
           <div className="absolute -top-6 md:-top-8 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-2 md:px-3 py-0.5 md:py-1 rounded-full border border-white/20 whitespace-nowrap z-[110] shadow-lg">
@@ -403,20 +553,20 @@ function PlanetWithVoucher({
         <div className={`${planetClass} relative flex items-center justify-center`}>
           {isEarth && (
             <>
-              <div className="absolute top-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-600/60 rounded-full blur-md rotate-[-20deg]" />
-              <div className="absolute bottom-[15%] right-[10%] w-[40%] h-[50%] bg-green-700/50 rounded-full blur-md rotate-[10deg]" />
-              <div className="absolute top-[40%] left-[10%] w-[30%] h-[20%] bg-green-600/40 rounded-full blur-sm" />
-              <div className="absolute inset-0 opacity-40 animate-pulse-slow">
-                <div className="absolute top-[5%] left-[30%] w-[60%] h-[15%] bg-white/60 rounded-full blur-sm rotate-[5deg]" />
-                <div className="absolute bottom-[20%] left-[10%] w-[50%] h-[10%] bg-white/40 rounded-full blur-sm rotate-[-10deg]" />
-                <div className="absolute top-[40%] right-[5%] w-[40%] h-[12%] bg-white/50 rounded-full blur-sm" />
+              <div className="absolute top-[10%] left-[20%] w-[50%] h-[40%] bg-emerald-600/80 rounded-full blur-md rotate-[-20deg]" />
+              <div className="absolute bottom-[15%] right-[10%] w-[40%] h-[50%] bg-green-700/70 rounded-full blur-md rotate-[10deg]" />
+              <div className="absolute top-[40%] left-[10%] w-[30%] h-[20%] bg-green-600/60 rounded-full blur-sm" />
+              <div className="absolute inset-0 opacity-60 animate-pulse-slow">
+                <div className="absolute top-[5%] left-[30%] w-[60%] h-[15%] bg-white/80 rounded-full blur-sm rotate-[5deg]" />
+                <div className="absolute bottom-[20%] left-[10%] w-[50%] h-[10%] bg-white/60 rounded-full blur-sm rotate-[-10deg]" />
+                <div className="absolute top-[40%] right-[5%] w-[40%] h-[12%] bg-white/70 rounded-full blur-sm" />
               </div>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.3),transparent_70%)]" />
-              <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4),transparent_70%)]" />
+              <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]" />
             </>
           )}
           {hasRing && (
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[15%] border-[2px] md:border-[3px] border-amber-400/40 rounded-[100%] rotate-[25deg] shadow-[0_0_20px_rgba(251,191,36,0.3)]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[15%] border-[2px] md:border-[3px] border-amber-400/70 rounded-[100%] rotate-[25deg] shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
           )}
           {hasStripes && (
             <>
@@ -424,13 +574,6 @@ function PlanetWithVoucher({
               <div className="absolute top-[60%] left-0 w-full h-[15%] bg-black/10" />
             </>
           )}
-        </div>
-
-        <div className={`absolute ${voucherPositionClass[voucherPosition]} transition-all duration-300 flex items-center gap-1 group/voucher z-[100]`}>
-          <div key={`${planetId}-${index}`} className={`bg-gradient-to-r ${currentVoucher.color} px-2 md:px-3 py-0.5 md:py-1 rounded-md md:rounded-lg border-2 border-white whitespace-nowrap min-w-max shadow-[0_0_20px_rgba(0,0,0,0.5)] ${animationClass}`}>
-            <div className="text-white font-black text-[8px] md:text-[12px] uppercase tracking-widest drop-shadow-md">{currentVoucher.title}</div>
-            <div className="text-white font-black text-xs md:text-lg text-center drop-shadow-md">{currentVoucher.discount}</div>
-          </div>
         </div>
       </div>
     </div>
