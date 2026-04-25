@@ -230,25 +230,15 @@ export function Universe() {
           <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto font-medium mb-10">
             Trải nghiệm hệ sinh thái Gamification độc đáo, nơi bạn không chỉ chơi mà còn nhận được những giá trị thực thông qua cơ chế O2O và kinh tế phi tập trung.
           </p>
-          <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3 max-w-[400px] mx-auto md:flex md:flex-wrap md:justify-center md:gap-4 md:max-w-none mb-12">
+          <div className="flex justify-center mb-12">
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" variant="outline" className="rounded-full border-primary/50 hover:bg-primary/10 text-primary px-4 min-[400px]:px-8 h-12 text-sm min-[400px]:text-base font-bold transition-all hover:scale-105 w-full md:w-auto">
-                  <Info className="mr-2 h-5 w-5 shrink-0" />
-                  Tìm hiểu thêm
-                </Button>
-              </DialogTrigger>
-              <EventInfoDialog />
-            </Dialog>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="lg" className="rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-background px-4 min-[400px]:px-8 h-12 text-sm min-[400px]:text-base font-bold shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:shadow-primary/40 w-full md:w-auto">
-                  <Dices className="mr-2 h-5 w-5 shrink-0" />
+                <Button size="lg" className="rounded-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-background px-8 h-14 text-base md:text-lg font-black shadow-lg shadow-primary/25 transition-all hover:scale-105 hover:shadow-primary/40 w-full max-w-[280px] md:w-auto uppercase tracking-wider">
+                  <Dices className="mr-3 h-6 w-6 shrink-0" />
                   Quay thưởng ngay
                 </Button>
               </DialogTrigger>
-              <EventInfoDialog />
+              <LuckySpinDialog />
             </Dialog>
           </div>
         </div>
@@ -257,21 +247,21 @@ export function Universe() {
         <div className="relative h-[650px] md:h-[850px] w-full flex items-center justify-center mb-2 md:mb-24 overflow-visible">
           
           {/* Top Stat: Hàng ngàn Hành tinh dịch vụ */}
-          <div className="absolute top-[60px] md:top-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+          <div className="absolute top-[40px] md:top-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
             <div className="relative inline-block">
-              <h3 className="text-4xl min-[350px]:text-6xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-primary/20 drop-shadow-[0_0_30px_rgba(0,217,255,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+              <h3 className="text-lg md:text-xl font-black text-white/70 tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
                 Hàng ngàn
               </h3>
             </div>
-            <div className="mt-1 md:mt-2 flex flex-col items-center">
-              <p className="text-lg min-[350px]:text-xl md:text-xl font-bold text-primary tracking-wide uppercase italic whitespace-nowrap">Hành tinh dịch vụ</p>
+            <div className="mt-0 flex flex-col items-center">
+              <p className="text-lg min-[350px]:text-2xl md:text-5xl font-black text-primary drop-shadow-[0_0_30px_rgba(0,217,255,0.4)] tracking-wide uppercase italic whitespace-nowrap pr-4 pl-1">Hành tinh dịch vụ</p>
             </div>
           </div>
 
           {/* 1. Mars - Reddish (Life Care) */}
           <PlanetWithVoucher
             planetId="mars"
-            name="Life Care"
+            name="Quán cafe"
             className="absolute top-[20%] md:top-[-8%] left-[5%] min-[391px]:left-[13%] md:left-[-5%]"
             planetClass="w-16 h-16 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-red-500 via-orange-700 to-red-950 animate-pulse-slow shadow-[0_0_60px_rgba(220,38,38,0.6)]"
             voucherPosition="center"
@@ -413,14 +403,14 @@ export function Universe() {
           </div>
 
           {/* Bottom Stat: Hàng triệu Ưu đãi, voucher miễn phí */}
-          <div className="absolute bottom-[60px] md:bottom-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
+          <div className="absolute bottom-[40px] md:bottom-[40px] left-0 w-full flex flex-col items-center justify-center z-50 pointer-events-none group/stat">
             <div className="relative inline-block">
-              <h3 className="text-4xl min-[350px]:text-6xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-accent/20 drop-shadow-[0_0_30px_rgba(255,107,53,0.4)] tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
+              <h3 className="text-lg md:text-xl font-black text-white/70 tracking-tighter uppercase italic whitespace-nowrap pr-4 pl-1">
                 Hàng triệu
               </h3>
             </div>
-            <div className="mt-1 md:mt-2 flex flex-col items-center">
-              <p className="text-lg min-[350px]:text-xl md:text-xl font-bold text-green-400 tracking-wide uppercase italic whitespace-nowrap">Ưu đãi, voucher miễn phí</p>
+            <div className="mt-0 flex flex-col items-center">
+              <p className="text-lg min-[350px]:text-2xl md:text-5xl font-black text-green-400 drop-shadow-[0_0_30px_rgba(74,222,128,0.4)] tracking-wide uppercase italic whitespace-nowrap pr-4 pl-1">Ưu đãi, voucher miễn phí</p>
             </div>
           </div>
         </div>
@@ -561,7 +551,7 @@ function PlanetWithVoucher({
         <div className={`${planetClass} relative flex items-center justify-center text-center p-2`}>
           {name && (
             <div className="relative z-[110] px-1 md:px-2">
-              <span className="text-white font-black text-[7px] md:text-[11px] uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight block">
+              <span className="text-white font-black text-[12px] md:text-[22px] uppercase tracking-tighter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight block">
                 {name}
               </span>
             </div>
@@ -595,121 +585,196 @@ function PlanetWithVoucher({
   );
 }
 
+function LuckySpinDialog() {
+  return (
+    <DialogContent className="max-w-md bg-[#0d122b]/95 border-primary/30 backdrop-blur-3xl p-0 gap-0 rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(0,217,255,0.2)]">
+      <div className="relative">
+        {/* Banner Image */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden">
+          <img 
+            src="/banner.jpg" 
+            alt="Lucky Spin Banner" 
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d122b] via-transparent to-transparent" />
+          
+          <div className="absolute bottom-4 left-6 right-6">
+            <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter drop-shadow-lg">
+              Vòng quay <span className="text-primary">May mắn</span>
+            </h3>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="space-y-3">
+            <p className="text-muted-foreground text-sm leading-relaxed font-medium">
+              Chào mừng hạm trưởng! Sử dụng lượt quay hàng ngày để nhận các vật phẩm quý hiếm, linh kiện phi thuyền và voucher O2O độc quyền từ đối tác.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full h-12 rounded-xl border-2 border-primary/50 bg-primary/5 hover:bg-primary/20 hover:border-primary text-primary font-black uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(0,217,255,0.1)] hover:shadow-[0_0_25px_rgba(0,217,255,0.3)] scale-100 hover:scale-[1.02]">
+                  Thể lệ
+                </Button>
+              </DialogTrigger>
+              <EventInfoDialog />
+            </Dialog>
+            
+            <Button 
+              asChild
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-background font-black uppercase tracking-wider shadow-lg shadow-primary/20 transition-all hover:scale-[1.02]"
+            >
+              <a href="https://vong-quay-space-game.vercel.app" target="_blank" rel="noopener noreferrer">
+                Quay ngay
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </DialogContent>
+  );
+}
+
 function EventInfoDialog() {
   return (
-    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-[#0d122b]/95 border-primary/30 backdrop-blur-3xl p-0 gap-0 rounded-3xl">
-      <div className="relative p-6 sm:p-8">
-        {/* Decorative Header Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-24 bg-primary/20 blur-[60px] rounded-full pointer-events-none" />
+    <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[92vh] overflow-y-auto bg-[#060918]/95 border-primary/20 backdrop-blur-3xl p-0 gap-0 rounded-[2.5rem] shadow-[0_0_80px_rgba(0,217,255,0.1)] focus:outline-none">
+      <div className="relative pb-8">
+        {/* Top Decorative Banner */}
+        <div className="h-32 w-full bg-gradient-to-br from-primary/20 via-accent/10 to-transparent relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,217,255,0.15)_0%,transparent_70%)]" />
+          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 blur-[60px] rounded-full" />
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
+             <div className="w-16 h-16 rounded-2xl bg-black/40 backdrop-blur-xl border border-primary/30 flex items-center justify-center shadow-2xl mb-2">
+                <Trophy className="w-8 h-8 text-primary animate-pulse" />
+             </div>
+          </div>
+        </div>
         
-        <DialogHeader className="relative z-10 mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center border border-primary/30 shadow-lg shadow-primary/10">
-              <Trophy className="w-6 h-6 text-primary" />
-            </div>
-            <div className="h-[1px] flex-grow bg-gradient-to-r from-primary/50 to-transparent" />
-          </div>
-          <DialogTitle className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
-            Vòng Quay <span className="text-primary">May Mắn</span> & Thể Lệ Sự Kiện
+        <div className="px-5 sm:px-10 -mt-4 relative z-10 text-center">
+          <DialogTitle className="text-2xl md:text-3xl font-black text-white tracking-tighter uppercase italic leading-none mb-1">
+            THỂ LỆ <span className="text-primary">APECSPACE</span> EXPLORER
           </DialogTitle>
-          <DialogDescription className="text-muted-foreground text-sm md:text-lg">
-            Sở hữu linh kiện phi thuyền độc bản và Voucher O2O giá trị.
+          <DialogDescription className="text-[11px] md:text-sm text-primary/60 font-bold uppercase tracking-[0.2em]">
+            Hành trình săn tìm báu vật vũ trụ
           </DialogDescription>
-        </DialogHeader>
+        </div>
 
-        <div className="space-y-10 relative z-10 pb-6">
-          {/* Lucky Spin Section */}
-          <div className="space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-8 bg-primary rounded-full" />
-              <h4 className="text-xl font-bold text-white uppercase tracking-wider">
-                1. Lucky Gacha
-              </h4>
-            </div>
-            <p className="text-muted-foreground/90 leading-relaxed pl-5 border-l border-white/10">
-              Nhận ngay **1 lượt quay miễn phí** mỗi ngày khi đăng nhập. Kiếm thêm lượt qua nhiệm vụ hoặc Điểm Không Gian (SP).
+        <div className="px-5 sm:px-10 mt-8 space-y-10 relative z-10">
+          {/* Section 1: Giới thiệu */}
+          <div className="space-y-3">
+            <h4 className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest">
+              <span className="w-6 h-[1px] bg-primary/30" />
+              01. GIỚI THIỆU
+            </h4>
+            <p className="text-sm text-muted-foreground leading-relaxed font-medium">
+              Chào mừng nhà thám hiểm! Hệ thống <span className="text-white font-bold">Vòng Quay May Mắn</span> là nơi bạn thu thập các mảnh ghép hiếm để quy đổi thành những đặc quyền và phần quà giá trị thực lên tới <span className="text-accent font-black underline italic">3 TỶ ĐỒNG</span>.
             </p>
-            <div className="grid grid-cols-1 min-[450px]:grid-cols-3 gap-3">
-              <div className="group bg-white/5 hover:bg-primary/10 p-4 rounded-2xl border border-white/10 hover:border-primary/40 transition-all duration-300 text-center shadow-inner">
-                <div className="text-3xl mb-2 transition-transform duration-500 group-hover:scale-125">🛸</div>
-                <div className="font-bold text-white text-xs mb-1 uppercase tracking-tighter">Linh kiện Mythic</div>
-                <div className="inline-block px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary">0.5% RATE</div>
+          </div>
+
+          {/* Section 2: Vòng Quay */}
+          <div className="space-y-4">
+            <h4 className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest">
+              <span className="w-6 h-[1px] bg-primary/30" />
+              02. HỆ THỐNG VÒNG QUAY
+            </h4>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="group relative p-5 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-primary/40 transition-all overflow-hidden">
+                <div className="relative z-10 flex justify-between items-start">
+                  <div className="space-y-1">
+                    <h5 className="font-black text-white text-base italic uppercase">Vòng Quay Thường</h5>
+                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">Viên ngoài - 24 ô thưởng</p>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-black text-[10px]">
+                    1 LƯỢT / QUAY
+                  </div>
+                </div>
+                <p className="mt-3 text-xs text-muted-foreground">Chứa mảnh ghép thường, EP và vật phẩm hỗ trợ cơ bản.</p>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
               </div>
-              <div className="group bg-white/5 hover:bg-accent/10 p-4 rounded-2xl border border-white/10 hover:border-accent/40 transition-all duration-300 text-center shadow-inner">
-                <div className="text-3xl mb-2 transition-transform duration-500 group-hover:scale-125">🎫</div>
-                <div className="font-bold text-white text-xs mb-1 uppercase tracking-tighter">Voucher 500k</div>
-                <div className="inline-block px-2 py-0.5 rounded-full bg-accent/20 text-[10px] font-bold text-accent">2% RATE</div>
-              </div>
-              <div className="group bg-white/5 hover:bg-secondary/10 p-4 rounded-2xl border border-white/10 hover:border-secondary/40 transition-all duration-300 text-center shadow-inner">
-                <div className="text-3xl mb-2 transition-transform duration-500 group-hover:scale-125">⚡</div>
-                <div className="font-bold text-white text-xs mb-1 uppercase tracking-tighter">1,000 EP</div>
-                <div className="inline-block px-2 py-0.5 rounded-full bg-secondary/20 text-[10px] font-bold text-secondary">25% RATE</div>
+
+              <div className="group relative p-5 rounded-3xl bg-accent/[0.03] border border-accent/20 hover:border-accent/60 transition-all overflow-hidden">
+                <div className="relative z-10 flex justify-between items-start">
+                  <div className="space-y-1">
+                    <h5 className="font-black text-accent text-base italic uppercase">Vòng Quay Đặc Biệt</h5>
+                    <p className="text-[10px] text-accent/60 font-bold uppercase tracking-tight">Viên trong - 9 ô VIP</p>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent font-black text-[10px]">
+                    5 LƯỢT / QUAY
+                  </div>
+                </div>
+                <p className="mt-3 text-xs text-muted-foreground italic">Cơ hội trúng <span className="text-white font-bold">MẢNH GHÉP ĐẶC BIỆT</span> có giá trị quy đổi cao gấp 10 lần.</p>
+                <div className="absolute bottom-0 right-0 w-24 h-24 bg-accent/5 blur-2xl rounded-full -mr-12 -mb-12 group-hover:bg-accent/10 transition-colors" />
               </div>
             </div>
           </div>
 
-          {/* Rules Section */}
-          <div className="space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-8 bg-accent rounded-full" />
-              <h4 className="text-xl font-bold text-white uppercase tracking-wider">
-                2. Thể Lệ Pre-Beta
-              </h4>
-            </div>
-            <div className="grid grid-cols-1 gap-3 pl-5">
+          {/* Section 3: Phân loại */}
+          <div className="space-y-4">
+            <h4 className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest">
+              <span className="w-6 h-[1px] bg-primary/30" />
+              03. VẬT PHẨM KHO ĐỒ
+            </h4>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {[
-                "Sự kiện diễn ra cho đến ngày ra mắt bản Beta chính thức.",
-                "Hoàn thành KYC cơ bản để bắt đầu rút thưởng Voucher.",
-                "Vật phẩm nhận được sẽ chuyển vào Kho lưu trữ cá nhân.",
-                "Nghiêm cấm các hành vi gian lận và đa tài khoản."
-              ].map((rule, idx) => (
-                <div key={idx} className="flex gap-3 text-muted-foreground/90 text-sm font-medium items-start">
-                  <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                  {rule}
+                { icon: "🧩", title: "Mảnh ghép", label: "Pieces", color: "from-blue-500/20" },
+                { icon: "🔄", title: "Lượt quay", label: "Spins", color: "from-green-500/20" },
+                { icon: "🪙", title: "Điểm & Xu", label: "Virtual", color: "from-yellow-500/20" },
+                { icon: "🎁", title: "Quà VIP", label: "Physical", color: "from-accent-500/20" },
+              ].map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 p-3 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-all group`}>
+                  <div className="text-xl group-hover:scale-110 transition-transform drop-shadow-lg">{item.icon}</div>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] font-black text-white leading-none uppercase">{item.title}</span>
+                    <span className="text-[8px] font-bold text-muted-foreground uppercase mt-1 tracking-widest">{item.label}</span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Rewards Goals Section */}
-          <div className="space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-8 bg-secondary rounded-full" />
-              <h4 className="text-xl font-bold text-white uppercase tracking-wider">
-                3. Mục Tiêu Đổi Thưởng
-              </h4>
-            </div>
-            <div className="space-y-3 pl-5">
-              <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-white/5 to-transparent rounded-2xl border border-white/10 hover:border-primary/30 transition-all cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <ShoppingBag className="w-5 h-5 text-primary" />
+          {/* Section 4: Đổi thưởng - Cards for Mobile */}
+          <div className="space-y-4">
+            <h4 className="flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest">
+              <span className="w-6 h-[1px] bg-primary/30" />
+              04. QUY TẮC ĐỔI THƯỞNG
+            </h4>
+            <div className="space-y-2">
+              {[
+                { mốc: "Mốc 01", cond: "9 mảnh khác nhau", gift: "MIỄN PHÍ GẠO 1 NĂM", color: "border-primary/20" },
+                { mốc: "Mốc 02", cond: "10 mảnh khác nhau", gift: "MIỄN PHÍ KHÁM BỆNH 1 NĂM", color: "border-primary/20" },
+                { mốc: "Mốc 03", cond: "11 mảnh khác nhau", gift: "THẺ APECSPACE TRỌN ĐỜI", color: "border-primary/20" },
+                { mốc: "Mốc 04", cond: "12 mảnh khác nhau", gift: "VOUCHER 3 TỶ | -50% MỌI HÀNH TINH", color: "border-accent/40 bg-accent/[0.02]", isVip: true },
+              ].map((row, i) => (
+                <div key={i} className={`flex items-center justify-between p-4 rounded-2xl border ${row.color} bg-white/[0.02] relative overflow-hidden group`}>
+                  <div className="flex flex-col gap-0.5">
+                    <span className={`text-[9px] font-black uppercase tracking-widest ${row.isVip ? 'text-accent' : 'text-primary/60'}`}>{row.mốc}</span>
+                    <span className="text-[10px] font-bold text-muted-foreground italic">{row.cond}</span>
                   </div>
-                  <span className="text-white font-bold text-sm">Voucher Siêu thị 200k</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-primary font-black text-sm">5,000</span>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">SP</span>
-                </div>
-              </div>
-              <div className="group flex items-center justify-between p-4 bg-gradient-to-r from-white/5 to-transparent rounded-2xl border border-white/10 hover:border-accent/30 transition-all cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Star className="w-5 h-5 text-accent" />
+                  <div className={`text-[11px] md:text-sm font-black text-right max-w-[180px] leading-tight ${row.isVip ? 'text-accent italic drop-shadow-[0_0_10px_rgba(255,107,53,0.3)]' : 'text-white'}`}>
+                    {row.gift}
                   </div>
-                  <span className="text-white font-bold text-sm">Buff Tốc độ Khai thác x2</span>
+                  {row.isVip && <div className="absolute top-0 right-0 h-full w-1 bg-accent" />}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-accent font-black text-sm">2,500</span>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">SP</span>
-                </div>
-              </div>
+              ))}
             </div>
+            <p className="text-[10px] text-muted-foreground italic px-2">
+              * Hệ thống tự động trừ mảnh khi đổi. BTC có thể cập nhật thêm quy tắc mới.
+            </p>
           </div>
 
-          <Button className="w-full h-14 bg-gradient-to-r from-primary via-blue-500 to-accent text-background font-black text-lg rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all duration-300 uppercase tracking-widest mt-4">
-            Khám phá & Chinh phục ngay!
-          </Button>
+          {/* Action Button */}
+          <div className="pt-4 sticky bottom-0 bg-gradient-to-t from-[#060918] via-[#060918] to-transparent pb-4">
+            <Button 
+              asChild
+              className="w-full h-14 bg-gradient-to-r from-primary to-accent hover:shadow-[0_0_30px_rgba(0,217,255,0.4)] text-background font-black text-base rounded-2xl transition-all duration-300 uppercase tracking-widest"
+            >
+              <a href="https://vong-quay-space-game.vercel.app" target="_blank" rel="noopener noreferrer">
+                Chinh phục hũ vàng ngay
+              </a>
+            </Button>
+          </div>
         </div>
       </div>
     </DialogContent>
